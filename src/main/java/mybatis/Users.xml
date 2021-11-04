@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- Users.xml -->
+<mapper namespace="user.users.model.UsersBean">
+	<insert id="registerUsers" parameterType="myUsersBean">
+		insert into users(num, ucode, id, pw, name, gender, email, birth, postcode, address1, address2, address3, address4, contact, regdate, status)
+		values(userseq.nextval, #{ucode}, #{id}, #{pw}, #{name}, #{gender}, #{email}, to_date(#{birth}), #{postcode}, #{address1}, #{address2}, #{address3}, #{address4}, #{contact}, sysdate, #{status})
+	</insert>
+	
+	<select id="idCheck" parameterType="String" resultType="myUsersBean">
+		select id from users where id = #{id}
+	</select>
+	
+	<select id="emailCheck" parameterType="String" resultType="myUsersBean">
+		select email from users where email = #{email}
+	</select>
+	
+	<select id="findId" parameterType="myUsersBean" resultType="myUsersBean">
+		select id from users where name = #{name} and email = #{email}
+	</select>
+	
+	<select id="findPw" parameterType="myUsersBean" resultType="myUsersBean">
+		select pw from users where id = #{id} and email = #{email}
+	</select>
+	
+	<select id="login" parameterType="myUsersBean" resultType="myUsersBean">
+		select * from users where id = #{id} and pw = #{pw}
+	</select>
+	
+	<update id="byeUsers" parameterType="myUsersBean">
+		update users set status = '탈퇴보류중' where id = #{id} and pw = #{pw}
+	</update>
+	
+	<select id="findIdwithNum" resultType="String">
+		select id from users where num = #{num}
+	</select>
+	
+	<delete id="deletePay" parameterType="String">
+		delete from pay where id = #{id}
+	</delete>
+	
+	<select id="findQnARef" resultType="myQnaBean">
+		select ref from qna where id = #{id}
+	</select>
+	
+	<delete id="deleteQnA" parameterType="int">
+		delete from qna where ref = #{ref}
+	</delete>
+	
+	<delete id="deleteLikes" parameterType="String">
+		delete from likes where id = #{id}
+	</delete>
+	
+	<delete id="deleteUsers" parameterType="int">
+		delete from users where num = #{num} 
+	</delete>
+	
+	<update id="updateMyInfo" parameterType="myUsersBean">
+		update users set
+		name = #{name}, email = #{email}, postcode = #{postcode},
+		address1 = #{address1}, address2 =  #{address2}, address3 = #{address3}, address4 = #{address4},
+		contact = #{contact}, moddate = sysdate, modid = #{modid}
+		where id = #{id}
+	</update>
+	
+	<update id="updateUserInfo" parameterType="myUsersBean">
+		update users set
+		gender = #{gender}, birth = to_date(#{birth}), status = #{status},
+		moddate = sysdate, modid = #{modid}
+		where num = #{num}
+	</update>
+	
+	<update id="updatePw" parameterType="myUsersBean">
+		update users set pw = #{pw} where id = #{id}
+	</update>
+	
+	<select id="getTotalCount" resultType="int">
+		select count(*) from users
+		where not ucode like 'admin'
+		<if test="whatColumn == 'ucode'">
+			and ucode like #{keyword}
+		</if>
+		<if test="whatColumn == 'id'">
+			and id like #{keyword}
+		</if>
+		<if test="whatColumn == 'name'">
+			and name like #{keyword}
+		</if>
+		<if test="whatColumn == 'contact'">
+			and contact like #{keyword}
+		</if>
+		<if test="whatColumn == 'status'">
+			and status like #{keyword}
+		</if>
+	</select>
+	
+	<select id="getList" resultType="myUsersBean">
+		select * from users
+		where not ucode like 'admin'
+		<if test="whatColumn == 'ucode'">
+			and ucode like #{keyword}
+		</if>
+		<if test="whatColumn == 'id'">
+			and id like #{keyword}
+		</if>
+		<if test="whatColumn == 'name'">
+			and name like #{keyword}
+		</if>
+		<if test="whatColumn == 'contact'">
+			and contact like #{keyword}
+		</if>
+		<if test="whatColumn == 'status'">
+			and status like #{keyword}
+		</if>
+		order by num
+	</select>
+	
+	<select id="getData" resultType="myUsersBean">
+		select * from users where num = #{num}
+	</select>
+</mapper>

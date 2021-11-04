@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- Room.xml -->
+<mapper namespace="user.room.model.RoomBean">
+
+	<insert id="insertData" parameterType="myRoomBean">
+		INSERT INTO ROOM(
+			NUM, NAME, ROOM_TYPE,
+			CNUM,
+			IMGURL, SUMMARY, CONTENTS,
+			PROPGUESTS, MAXGUESTS,
+			WEEKDAYPRICE, WEEKENDPRICE,
+			OPTIONS, AMENITY,
+			REGDATE, REGID,
+			STATUS
+		)
+		VALUES(
+			#{num}, #{name}, #{roomtype},
+			#{cnum},
+			#{imgurl}, #{summary}, #{contents},
+			#{propguests}, #{maxguests},
+			#{weekdayprice}, #{weekendprice},
+			#{options}, #{amenity},
+			SYSDATE, #{regid},
+			'01'
+		)
+	</insert>
+	
+	<select id="getRoomMaxNum" resultType="int">
+		SELECT ROOMSEQ.NEXTVAL FROM DUAL
+	</select>
+	
+	<select id="getRoomList" resultType="myRoomBean">
+      SELECT 
+         NUM, NAME, ROOM_TYPE,
+         IMGURL, SUMMARY, 
+         PROPGUESTS, MAXGUESTS,
+         WEEKDAYPRICE, WEEKENDPRICE,
+         OPTIONS, AMENITY
+      FROM ROOM
+      WHERE 
+         CNUM = #{cnum} 
+         <if test="status == '01'">
+            AND STATUS = #{status}
+         </if>
+      ORDER BY NUM ASC
+   </select>
+	
+	<select id="getRoomDetail" resultType="myRoomBean">
+		SELECT * FROM ROOM
+		WHERE NUM = #{num}
+	</select>
+	
+	<!-- 캠핑장 번호, 객실 번호, 주중/주말가격, 기준인원 가져옴 -->
+	<select id="getRoomReserveInfo" resultType="myRoomBean">
+		SELECT 
+			NUM, NAME, ROOM_TYPE,
+			CNUM, REGID,
+			PROPGUESTS,
+			WEEKDAYPRICE,
+			WEEKENDPRICE
+		FROM ROOM
+		WHERE NUM = #{rnum}
+	</select>
+	
+	<select id="getCampingName" resultType="String">
+		SELECT DISTINCT C.NAME
+		FROM CAMPING C, ROOM R
+		WHERE C.NUM = #{cnum}
+	</select>
+	
+	<update id="updateData">
+		UPDATE ROOM
+		<set>
+			NAME = #{name},
+			ROOM_TYPE = #{roomtype},
+			IMGURL = #{imgurl},
+			SUMMARY = #{summary},
+			CONTENTS = #{contents},
+			PROPGUESTS = #{propguests},
+			MAXGUESTS = #{maxguests},
+			WEEKDAYPRICE = #{weekdayprice},
+			WEEKENDPRICE = #{weekendprice},
+			OPTIONS = #{options},
+			AMENITY = #{amenity},
+			MODDATE = SYSDATE,
+			MODID = #{modid}
+		</set>
+		WHERE NUM = #{num}
+	</update>
+	
+	<select id="getCampingNum" resultType="String">
+		SELECT CNUM
+		FROM ROOM
+		WHERE NUM = #{num}
+	</select>
+	
+	<update id="updateRoomStatus">
+      UPDATE ROOM
+      <set>
+         STATUS = #{status}
+      </set>
+      <choose>
+            <when test="cnum != null and cnum != '' ">
+                 WHERE CNUM = #{cnum}
+            </when>
+            <otherwise>WHERE NUM = #{num}</otherwise>
+        </choose>      
+   </update>
+	
+</mapper>
